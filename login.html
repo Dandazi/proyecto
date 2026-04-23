@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login App</title>
+    <style>
+        body { font-family: Arial; background: #f2f2f2; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-container { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }
+        h2 { text-align: center; color: #333; }
+        input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #42a5f5; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #1e88e5; }
+        .error { color: red; text-align: center; margin-top: 10px; }
+        .success { color: green; text-align: center; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>Iniciar sesión</h2>
+    <input type="email" id="email" placeholder="Correo electrónico" value="test@example.com">
+    <input type="password" id="password" placeholder="Contraseña" value="123456">
+    <button onclick="login()">Entrar</button>
+    <p id="message"></p>
+</div>
+
+<script>
+    async function login() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const message = document.getElementById('message');
+
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                localStorage.setItem('token', data.access_token);
+                message.className = 'success';
+                message.innerText = '✅ Login exitoso. Token guardado.';
+                setTimeout(() => {
+                    alert('¡Bienvenido! Token: ' + data.access_token.substring(0, 20) + '...');
+                }, 500);
+            } else {
+                message.className = 'error';
+                message.innerText = data.message || '❌ Error de autenticación';
+            }
+        } catch (error) {
+            message.className = 'error';
+            message.innerText = '❌ Error de conexión';
+        }
+    }
+</script>
+</body>
+</html>
